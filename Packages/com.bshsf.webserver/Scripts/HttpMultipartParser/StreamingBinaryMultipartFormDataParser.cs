@@ -254,12 +254,12 @@ namespace HttpMultipartParser
         {
             // Presumably the boundary is --|||||||||||||| where -- is the stuff added on to
             // the front as per the protocol and ||||||||||||| is the part we care about.
-            string line = reader.ReadLine();
-            while (line.Equals("\r\n")) // Unity µÄ Multpartdata »á²åÈëÒ»¸ö¿Õ°×ĞĞ
+            // Unity çš„ Multpartdata ä¼šæ’å…¥ä¸€ä¸ªç©ºç™½è¡Œ
+            string line = string.Empty;
+            while (line == string.Empty)
             {
                 line = reader.ReadLine();
             }
-
             // The line must not be empty and must starts with "--".
             if (string.IsNullOrEmpty(line)) throw new MultipartParseException("Unable to determine boundary: unexpected end of stream");
             else if (!line.StartsWith("--")) throw new MultipartParseException("Unable to determine boundary: content does not start with a valid multipart boundary");
@@ -300,7 +300,11 @@ namespace HttpMultipartParser
         {
             // Presumably the boundary is --|||||||||||||| where -- is the stuff added on to
             // the front as per the protocol and ||||||||||||| is the part we care about.
-            var line = await reader.ReadLineAsync(cancellationToken).ConfigureAwait(false);
+            string line = string.Empty;
+            while (line == string.Empty)
+            {
+                line = await reader.ReadLineAsync(cancellationToken).ConfigureAwait(false);
+            }
 
             // The line must not be empty and must starts with "--".
             if (string.IsNullOrEmpty(line)) throw new MultipartParseException("Unable to determine boundary: either the stream is empty or we reached the end of the stream");
