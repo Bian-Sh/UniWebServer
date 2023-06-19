@@ -27,7 +27,9 @@ public class FileUploader : MonoBehaviour
             byte[] fileData = File.ReadAllBytes(fileFullPath);
             string fileName = Path.GetFileName(fileFullPath);
             fileName = Uri.EscapeDataString(fileName);// 解决中文乱码问题
-            formData.Add(new MultipartFormFileSection("files[]", fileData, fileName, "application/octet-stream"));
+            var contentType= MimeMapping.GetMimeMapping(fileName);
+            var fileContent = new MultipartFormFileSection("files[]", fileData, fileName, contentType);
+            formData.Add(fileContent);
         }
 
         using (UnityWebRequest request = UnityWebRequest.Post(uploadURL, formData))
