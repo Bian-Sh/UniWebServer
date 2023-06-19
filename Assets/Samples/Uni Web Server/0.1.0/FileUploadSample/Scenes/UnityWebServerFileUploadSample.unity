@@ -446,11 +446,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c7dfa39a78a07c84cbef7f5af0669b11, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  uploadURL: http://192.168.137.1:8080
+  uploadURL: http://localhost:8080
   files:
-  - C:\Users\BianShanghai\Desktop\(36).png
-  - C:\Users\BianShanghai\Downloads\Compressed\nsis-3.0.3.2.7z
-  - C:\Users\BianShanghai\Downloads\Compressed\PopClip-2022.12.zip
+  - For Upload Example/From/Cover.png
+  - For Upload Example/From/Test.zip
+  - "For Upload Example/From/City Of stars  - \u738BOK.mp4"
 --- !u!1 &994110007
 GameObject:
   m_ObjectHideFlags: 0
@@ -711,15 +711,27 @@ PrefabInstance:
       objectReference: {fileID: 4924549078187075439}
     - target: {fileID: 4924549079953464493, guid: cf6df4e7eb5101141a48af8017968ab6, type: 3}
       propertyPath: staticRouteSettings.Array.size
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 4924549079953464493, guid: cf6df4e7eb5101141a48af8017968ab6, type: 3}
       propertyPath: staticRouteSettings.Array.data[0].UrlRoot
       value: /staticpage
       objectReference: {fileID: 0}
     - target: {fileID: 4924549079953464493, guid: cf6df4e7eb5101141a48af8017968ab6, type: 3}
+      propertyPath: staticRouteSettings.Array.data[1].UrlRoot
+      value: /upload
+      objectReference: {fileID: 0}
+    - target: {fileID: 4924549079953464493, guid: cf6df4e7eb5101141a48af8017968ab6, type: 3}
       propertyPath: staticRouteSettings.Array.data[0].StreamingAssetsPath
       value: /StaticPage
+      objectReference: {fileID: 0}
+    - target: {fileID: 4924549079953464493, guid: cf6df4e7eb5101141a48af8017968ab6, type: 3}
+      propertyPath: staticRouteSettings.Array.data[1].FallbackToIndexHtml
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4924549079953464493, guid: cf6df4e7eb5101141a48af8017968ab6, type: 3}
+      propertyPath: staticRouteSettings.Array.data[1].StreamingAssetsPath
+      value: /Upload
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: cf6df4e7eb5101141a48af8017968ab6, type: 3}
@@ -741,3 +753,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   imageViewer: {fileID: 994110012}
+  savePath: For Upload Example/To
