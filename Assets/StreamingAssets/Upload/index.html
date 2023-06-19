@@ -1,0 +1,62 @@
+
+<HTML>
+<HEAD>
+<STYLE TYPE="text/css">
+<!--
+.p9{ font-size: 9pt; font-family: 宋体 }
+td {font-size: 9pt}
+.tx {height: 16px; width: 30px; border-color: black black #000000; border-top-width: 0px; border-right-width: 0px; border-bottom-width: 1px; border-left-width: 0px; font-size: 9pt; background-color: #eeeeee; color: #0000FF}
+.tx2 {height: 16px;border-top-width: 0px; border-right-width: 0px; border-bottom-width: 1px; border-left-width: 0px; font-size: 9pt; color: #0000FF; border-left-color:#000000; border-right-color:#000000; border-top-color:#000000; border-bottom-color:#000000}
+.bt {border-left:1px solid #C0C0C0; border-top:1px solid #C0C0C0; font-size: 9pt; border-right-width: 1; border-bottom-width: 1; height: 16px; width: 80px; background-color: #EEEEEE; cursor: hand; border-right-style:solid; border-bottom-style:solid}
+.tx1 { width: 400 ;height: 20px; font-size: 9pt; border: 1px solid; border-color: black black #000000; color: #0000FF}
+-->
+</STYLE>
+<script type="text/javascript" language="javascript">
+function  addfile(a) {
+	var str;
+	str = "<table>";
+	var pattern = /^([0-9])+$/; 
+	flag = pattern.test(a);
+	if(!flag) {
+		a = 1;
+		}
+	for  (var  i=1;i<parseInt(a)+1;i++)      
+	{
+		str = str + "<tr><td valign='middle'>文件" + i + ":</td><td><input type='file' name='file" + i + "' class='tx1' value size='20'>　　保存为<input type='text' name='file" + i + "' size='20' class='tx2'></td></tr>"
+	}
+	document.getElementById("uptd").innerHTML = str;
+}
+</script>
+<TITLE>Uni Web Server</TITLE>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=gb2312"></HEAD>
+<BODY BGCOLOR="#ffffff" CLASS="p9" onLoad="addfile()">
+<FORM METHOD="post" ENCTYPE="multipart/form-data">
+  <TABLE BORDER="0" ALIGN="center" CELLPADDING="0" CELLSPACING="0">
+    <TR> 
+      <TD><DIV ALIGN="center"><FONT COLOR="#0000ff" SIZE="5">上传示例</FONT></DIV></TD>
+    </TR>
+    <TR> 
+      <TD><TABLE WIDTH="750" BORDER="1" ALIGN="center" CELLPADDING="0" CELLSPACING="0" BORDERCOLOR="#111111" STYLE="BORDER-COLLAPSE: collapse">
+          <TR> 
+            <TD HEIGHT="27" COLSPAN="2">上传 
+              <INPUT NAME="filenum" CLASS="tx2" VALUE="1" SIZE="4" onChange="addfile(this.value)">
+              个文件　　 
+              <INPUT TYPE="button" NAME="Button" CLASS="bt" onClick="javascript:addfile(document.getElementsByName(""filenum"").value);" VALUE="设 定">
+            </TD>
+          </TR>
+          <TR> 
+            <TD> <DIV ID="uptd"> </DIV></TD>
+          </TR>
+          <TR> 
+            <TD HEIGHT="30" COLSPAN="2" ALIGN="middle"> 
+              <INPUT TYPE="submit" NAME="Button" CLASS="bt" VALUE="上 传">
+              　　 
+              <INPUT TYPE="reset" NAME="Button" CLASS="bt" VALUE="重 置">
+            </TD>
+          </TR>
+        </TABLE></TD>
+    </TR>
+  </TABLE>
+</FORM>
+</BODY>
+</HTML>
