@@ -109,7 +109,16 @@ namespace zFramework.Web
             try
             {
                 var contents = File.ReadAllBytes(filePath);
+                //response.ContentLength64 = contents.LongLength;
+                response.Headers.Add(HttpRequestHeader.ContentLength, contents.LongLength.ToString());
+
+                foreach (var item in response.Headers)
+                {
+                    Debug.Log($"{nameof(StaticPageController)}: item + value ={item} + {response.Headers[item.ToString()]}");
+                }
+                response.ContentLength64 = contents.LongLength;
                 await response.OutputStream.WriteAsync(contents, 0, contents.Length);
+                Debug.Log($"{nameof(StaticPageController)}: File Send Completed!");
             }
             catch (Exception e)
             {
