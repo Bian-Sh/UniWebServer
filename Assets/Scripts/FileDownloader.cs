@@ -12,7 +12,7 @@ public class FileDownloader : MonoBehaviour
     [Button]
     async void DownLoadAsync()
     {
-        var orign = Path.Combine(Application.streamingAssetsPath, "For Upload Example/From/City Of stars  - ÍõOK.mp4");
+        var orign = Path.Combine(Application.streamingAssetsPath, "For Upload Example/From/City Of stars  - çŽ‹OK.mp4");
         var target = Path.Combine(Application.streamingAssetsPath, "StaticPage/test.mp4");
         if (!File.Exists(target))
         {
@@ -36,25 +36,12 @@ public class FileDownloader : MonoBehaviour
         using var dh = new DownloadHandlerFile(file);
         dh.removeFileOnAbort = true;
         uwr.downloadHandler = dh;
-        var progress = new Progress<float>(p => Debug.Log($"Upload Progress: {p}"));
+        var progress = new Progress<float>(p => Debug.Log($"download Progress: {p}"));
         var op = uwr.SendWebRequest();
-        var headers = uwr.GetResponseHeaders();
-        if (headers != null)
-        {
-            foreach (var item in headers)
-            {
-                Debug.Log($"{nameof(FileDownloader)}:  header = {item.Key} value = {item.Value}");
-            }
-        }
-        var lenght = uwr.GetResponseHeader("Content-Length");
-        Debug.Log($"{nameof(FileDownloader)}: Length = {lenght} ");
         while (!op.isDone)
         {
-            ((IProgress<float>)progress).Report(uwr.uploadProgress);
-            //  Debug.Log(uwr.downloadedBytes.ToString());
+            ((IProgress<float>)progress).Report(uwr.downloadProgress);            
             await Task.Delay(200);
-            //Debug.Log(op.progress.ToString("P"));
-            //Debug.Log(op.webRequest.downloadProgress.ToString("P"));
         }
 
         if (!string.IsNullOrEmpty(uwr.error))
