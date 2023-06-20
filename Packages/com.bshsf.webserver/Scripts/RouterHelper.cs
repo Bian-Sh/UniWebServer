@@ -10,7 +10,7 @@ namespace zFramework.Web
     {
         public static bool TryParseMapAttribute(MethodInfo method, RouteAttribute route, out List<Parameter> parameters)
         {
-            var mapParameters = route.Path.Split('/')
+            var mapParameters = route.Path.Split('/', StringSplitOptions.RemoveEmptyEntries)
                 .Where(x => !string.IsNullOrWhiteSpace(x))
                 .ToArray();
             var methodParameters = method.GetParameters();
@@ -171,7 +171,7 @@ namespace zFramework.Web
             switch (parameter.Type)
             {
                 case ParameterType.Static:
-                    return strParameter == parameter.Name;
+                    return strParameter.Equals(parameter.Name, StringComparison.OrdinalIgnoreCase);
                 case ParameterType.DefaultPage:
                     return strParameter == "/";
                 case ParameterType.String:
