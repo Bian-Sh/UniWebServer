@@ -111,9 +111,33 @@ namespace zFramework.Web
                 await ToOtherThread;
                 using var fileStream = File.OpenRead(filePath);
                 var length = fileStream.Length;
-                response.ContentLength64 = length;
-                response.Headers.Add(HttpRequestHeader.ContentLength, length.ToString());
-                await fileStream.CopyToAsync(response.OutputStream);
+
+                if (request.Headers.AllKeys.Contains("Range"))
+                {
+                    // Handle Range header
+                    string rangeHeader = request.Headers.GetValues("Range")[0].Replace("bytes=", "");
+                    string[] range = rangeHeader.Split('-');
+                    long startByte = long.Parse(range[0]);
+                    long endByte = range[1].Trim().Length > 0 ? long.Parse(range[1]) : length - 1;
+                    long byteRange = endByte - startByte + 1;
+
+                    response.StatusCode = 206;
+                    response.StatusDescription = "Partial Content";
+                    response.ContentLength64 = byteRange;
+                    response.AddHeader("Content-Range", $"bytes {startByte}-{endByte}/{length}");
+
+                    byte[] buffer = new byte[byteRange];
+                    fileStream.Seek(startByte, SeekOrigin.Begin);
+                    await fileStream.ReadAsync(buffer, 0, (int)byteRange);
+                    await response.OutputStream.WriteAsync(buffer, 0, (int)byteRange);
+                }
+                else
+                {
+                    // Send entire file
+                    response.ContentLength64 = length;
+                    response.Headers.Add(HttpRequestHeader.ContentLength, length.ToString());
+                    await fileStream.CopyToAsync(response.OutputStream);
+                }
             }
             catch (Exception e)
             {
