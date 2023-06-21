@@ -29,7 +29,7 @@ namespace zFramework.Web
         public StaticPageController(StaticRouteSetting staticRouteSetting)
         {
             FallbackToIndexHtml = staticRouteSetting.FallbackToIndexHtml;
-            StreamingAssetsRootPath = staticRouteSetting.StreamingAssetsPath;
+            StreamingAssetsRootPath = staticRouteSetting.StreamingAssetsPath.Replace("\\", "/");
             UrlRoot = staticRouteSetting.UrlRoot;
         }
 
@@ -108,11 +108,12 @@ namespace zFramework.Web
 
             try
             {
-                var contents = File.ReadAllBytes(filePath);
-                response.Headers.Add(HttpRequestHeader.ContentLength, contents.LongLength.ToString());
-                response.ContentLength64 = contents.LongLength;
                 await ToOtherThread;
-                await response.OutputStream.WriteAsync(contents, 0, contents.Length);
+                using var fileStream = File.OpenRead(filePath);
+                var length = fileStream.Length;
+                response.ContentLength64 = length;
+                response.Headers.Add(HttpRequestHeader.ContentLength, length.ToString());
+                await fileStream.CopyToAsync(response.OutputStream);
             }
             catch (Exception e)
             {
@@ -120,6 +121,7 @@ namespace zFramework.Web
             }
         }
 
+        //Todo: 从 static route setting 中获取映射的目录的逻辑有点不是预期，需要修改
         private string GetFilePath(string path)
         {
             var rootPath = StreamingAssetsRootPath.Trim('/');
@@ -131,7 +133,6 @@ namespace zFramework.Web
             {
                 path += defaultPage;
             }
-
             return Path.Combine(Application.streamingAssetsPath, rootPath, path);
         }
     }

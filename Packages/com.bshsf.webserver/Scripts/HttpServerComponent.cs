@@ -39,7 +39,7 @@ namespace zFramework.Web
                 httpServer.AddControllerMethod(staticPageController.GetControllerMethod());
             }
         }
-        private void OnEnable() => httpServer.Start(port);
-        private void OnDisable() => httpServer.Stop();
+        private void OnEnable() => httpServer?.Start(port);
+        private void OnDisable() => httpServer?.Stop();
     }
 }
