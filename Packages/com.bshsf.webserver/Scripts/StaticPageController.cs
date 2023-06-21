@@ -74,10 +74,10 @@ namespace zFramework.Web
             return controllerMethod;
         }
 
-
         public async Task GetStaticContents(string path, HttpListenerRequest request, HttpListenerResponse response)
         {
-            if (request.HttpMethod == "GET")
+            Debug.Log($"{nameof(StaticPageController)}: request method = {request.HttpMethod}");
+            if (request.HttpMethod == "GET" || request.HttpMethod == "HEAD")
             {
                 Debug.Log($"{nameof(StaticPageController)}: path = {path}");
                 await SendFile(path, request, response);
@@ -87,7 +87,7 @@ namespace zFramework.Web
                 response.StatusCode = 405;
             }
         }
-
+        Dictionary<int, FileStream> cachedStreams = new();
         private async Task SendFile(string path, HttpListenerRequest request, HttpListenerResponse response)
         {
             var filePath = GetFilePath(path);
@@ -105,43 +105,56 @@ namespace zFramework.Web
 
             var filename = Path.GetFileName(filePath);
             response.ContentType = MimeMapping.GetMimeMapping(filename);
-
+            var pathHash = filePath.GetHashCode();
             try
             {
                 await ToOtherThread;
-                using var fileStream = File.OpenRead(filePath);
-                var length = fileStream.Length;
-
-                if (request.Headers.AllKeys.Contains("Range"))
+                if (!cachedStreams.TryGetValue(pathHash, out var fileStream))
                 {
-                    // Handle Range header
-                    string rangeHeader = request.Headers.GetValues("Range")[0].Replace("bytes=", "");
-                    string[] range = rangeHeader.Split('-');
-                    long startByte = long.Parse(range[0]);
-                    long endByte = range[1].Trim().Length > 0 ? long.Parse(range[1]) : length - 1;
-                    long byteRange = endByte - startByte + 1;
-
-                    response.StatusCode = 206;
-                    response.StatusDescription = "Partial Content";
-                    response.ContentLength64 = byteRange;
-                    response.AddHeader("Content-Range", $"bytes {startByte}-{endByte}/{length}");
-
-                    byte[] buffer = new byte[byteRange];
-                    fileStream.Seek(startByte, SeekOrigin.Begin);
-                    await fileStream.ReadAsync(buffer, 0, (int)byteRange);
-                    await response.OutputStream.WriteAsync(buffer, 0, (int)byteRange);
+                    fileStream = File.OpenRead(filePath);
+                    cachedStreams[pathHash] = fileStream;  
                 }
-                else
+                var length = fileStream.Length;
+                response.ContentLength64 = length;
+                response.Headers.Add(HttpRequestHeader.ContentLength, length.ToString());
+
+                if (request.HttpMethod != "HEAD")
                 {
-                    // Send entire file
-                    response.ContentLength64 = length;
-                    response.Headers.Add(HttpRequestHeader.ContentLength, length.ToString());
-                    await fileStream.CopyToAsync(response.OutputStream);
+                    if (request.Headers.AllKeys.Contains("Range"))
+                    {
+                        // Handle Range header
+                        string rangeHeader = request.Headers.GetValues("Range")[0].Replace("bytes=", "");
+                        string[] range = rangeHeader.Split('-');
+                        long startByte = long.Parse(range[0]);
+                        long endByte = range[1].Trim().Length > 0 ? long.Parse(range[1]) : length - 1;
+                        long byteRange = endByte - startByte + 1;
+
+                        response.StatusCode = 206;
+                        response.StatusDescription = "Partial Content";
+                        response.ContentLength64 = byteRange;
+                        response.AddHeader("Content-Range", $"bytes {startByte}-{endByte}/{length}");
+
+                        byte[] buffer = new byte[byteRange];
+                        fileStream.Seek(startByte, SeekOrigin.Begin);
+                        await fileStream.ReadAsync(buffer, 0, (int)byteRange);
+                        await response.OutputStream.WriteAsync(buffer, 0, (int)byteRange);
+                    }
+                    else
+                    {
+                        // Send entire file
+                        await fileStream.CopyToAsync(response.OutputStream);
+                    }
                 }
             }
             catch (Exception e)
             {
                 Debug.LogWarning(e);
+            }
+            finally
+            {
+                var stream = cachedStreams[pathHash];
+                cachedStreams.Remove(pathHash);
+                stream?.Dispose();
             }
         }
 
