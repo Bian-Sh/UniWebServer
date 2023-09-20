@@ -16,11 +16,11 @@ public class FileDownloader : MonoBehaviour
         var target = Path.Combine(Application.streamingAssetsPath, "StaticPage/test.mp4");
         if (!File.Exists(target))
         {
-            #region UNITY_EDITOR
+#if UNITY_EDITOR
             UnityEditor.FileUtil.CopyFileOrDirectory(orign, target);
-            #endregion
+#endif
         }
-        
+
         var path = Path.Combine(Application.streamingAssetsPath, folder);
         if (!Directory.Exists(path))
         {
@@ -40,7 +40,7 @@ public class FileDownloader : MonoBehaviour
         var op = uwr.SendWebRequest();
         while (!op.isDone)
         {
-            ((IProgress<float>)progress).Report(uwr.downloadProgress);            
+            ((IProgress<float>)progress).Report(uwr.downloadProgress);
             await Task.Delay(200);
         }
 
